@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Room Directory</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:#0d9488; --teal-dark:#0f766e; --teal-light:#14b8a6;
+  --teal-pale:#ccfbf1; --teal-xpale:#f0fdfa;
+  --white:#ffffff; --off:#f8fffe;
+  --text:#0f2f2c; --text2:#2d6b65; --text3:#6aada7;
+  --border:#b2e4de; --border2:#d1f5f0;
+  --shadow:rgba(13,148,136,0.12); --shadow2:rgba(13,148,136,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);min-height:100vh;}
+
+header{background:var(--white);border-bottom:2px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px var(--shadow);}
+.hdr{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:1rem 0;}
+.logo{display:flex;align-items:center;gap:.8rem;}
+.logo-mark{width:44px;height:44px;background:linear-gradient(135deg,var(--teal),var(--teal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 14px var(--shadow2);}
+.logo-text h1{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text);}
+.logo-text p{font-size:.7rem;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;}
+.kpis{display:flex;gap:2rem;}
+.kpi{text-align:center;}
+.kpi .n{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--teal);}
+.kpi .l{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+
+.search-band{background:linear-gradient(135deg,var(--teal-dark),var(--teal),var(--teal-light));padding:2.2rem 2rem 3.2rem;position:relative;overflow:hidden;}
+.search-band::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:36px;background:var(--off);clip-path:ellipse(55% 100% at 50% 100%);}
+.s-inner{max-width:680px;margin:0 auto;position:relative;z-index:1;}
+.s-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:#fff;text-align:center;margin-bottom:1rem;font-style:italic;}
+.s-box{position:relative;}
+.s-box input{width:100%;padding:.95rem 3.2rem .95rem 3rem;background:#fff;border:none;border-radius:50px;font-size:1rem;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;box-shadow:0 8px 28px rgba(0,0,0,.18);}
+.s-box input:focus{box-shadow:0 8px 28px rgba(0,0,0,.22),0 0 0 3px rgba(255,255,255,.3);}
+.s-box input::placeholder{color:var(--text3);}
+.s-ico{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--teal);font-size:1rem;}
+.s-clr{position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:.95rem;display:none;}
+.s-clr:hover{color:var(--teal);}
+
+#flashWrap{max-width:1300px;margin:0 auto;padding:0 2rem;display:none;}
+.flash-card{background:#fff;border:2px solid var(--teal-light);border-radius:16px;padding:1.3rem 1.8rem;display:flex;align-items:center;gap:1.6rem;margin-top:-.8rem;box-shadow:0 8px 28px var(--shadow2);animation:popIn .35s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+.flash-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--teal-light),var(--teal-dark));}
+@keyframes popIn{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.f-badge{width:72px;height:72px;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--teal-light));border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px var(--shadow2);}
+.f-badge .fn{font-family:'DM Serif Display',serif;font-size:1.4rem;line-height:1;}
+.f-badge .fl{font-size:.5rem;text-transform:uppercase;letter-spacing:1px;opacity:.8;}
+.f-info{flex:1;}
+.f-found{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);font-weight:600;margin-bottom:2px;}
+.f-name{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--text);}
+.f-tags{display:flex;gap:.5rem;margin-top:.4rem;flex-wrap:wrap;}
+.ftag{padding:.22rem .7rem;border-radius:20px;font-size:.73rem;font-weight:600;}
+.ftag.b{background:var(--teal-pale);color:var(--teal-dark);}
+.ftag.f{background:#fef9c3;color:#854d0e;}
+.ftag.c{background:#ede9fe;color:#6b21a8;}
+
+#multiWrap{display:none;max-width:1300px;margin:0 auto;padding:0 2rem;margin-top:-.4rem;}
+.m-label{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;}
+.m-grid{display:flex;gap:.5rem;flex-wrap:wrap;}
+.mini-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:.7rem 1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.7rem;}
+.mini-card:hover{border-color:var(--teal);box-shadow:0 4px 14px var(--shadow);}
+.m-badge{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--teal),var(--teal-light));}
+.m-name{font-weight:600;font-size:.83rem;color:var(--text);}
+.m-sub{font-size:.7rem;color:var(--text3);}
+
+#noResult{display:none;max-width:1300px;margin:0 auto;padding:0 2rem;margin-top:-.4rem;}
+.no-box{background:#fff;border:1.5px solid var(--border2);border-radius:12px;padding:1rem 1.4rem;text-align:center;color:var(--text3);}
+
+.main{max-width:1300px;margin:0 auto;padding:1.8rem 2rem 6rem;}
+.view-tabs{display:flex;gap:.4rem;margin-bottom:1.6rem;border-bottom:2px solid var(--border2);}
+.tab-btn{padding:.5rem 1.2rem;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s;border-radius:6px 6px 0 0;}
+.tab-btn:hover{color:var(--teal);}
+.tab-btn.active{color:var(--teal-dark);border-bottom-color:var(--teal);background:rgba(13,148,136,.05);}
+
+/* ===== ACCORDION ===== */
+.dash-sec{margin-bottom:.75rem;}
+
+.acc-hdr{
+  display:flex;align-items:center;gap:.9rem;
+  padding:1rem 1.4rem;
+  background:#fff;
+  border:1.5px solid var(--border2);
+  border-radius:14px;
+  cursor:pointer;
+  user-select:none;
+  transition:background .2s, border-color .2s, box-shadow .2s, border-radius .2s;
+}
+.acc-hdr:hover{
+  border-color:var(--teal-light);
+  box-shadow:0 4px 16px var(--shadow);
+  background:var(--teal-xpale);
+}
+.acc-hdr.is-open{
+  background:var(--teal-xpale);
+  border-color:var(--teal);
+  border-bottom-color:transparent;
+  border-radius:14px 14px 0 0;
+}
+.acc-icon{width:36px;height:36px;border-radius:10px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;transition:background .2s;}
+.acc-hdr.is-open .acc-icon{background:rgba(13,148,136,.18);}
+.acc-label{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--text);flex:1;}
+.acc-count{font-size:.73rem;color:var(--teal-dark);background:var(--teal-pale);padding:.18rem .65rem;border-radius:20px;font-weight:700;}
+.acc-arrow{font-size:.75rem;color:var(--text3);transition:transform .3s cubic-bezier(.34,1.56,.64,1), color .2s;flex-shrink:0;}
+.acc-hdr.is-open .acc-arrow{transform:rotate(180deg);color:var(--teal);}
+
+.acc-body{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .45s cubic-bezier(.4,0,.2,1);
+  background:#fff;
+  border:0 solid var(--teal);
+  border-top:none;
+  border-radius:0 0 14px 14px;
+}
+.acc-body.is-open{
+  max-height:4000px;
+  border-width:1.5px;
+}
+.acc-inner{padding:1rem;}
+
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.65rem;}
+.cat-card{background:var(--off);border:1.5px solid var(--border2);border-radius:12px;padding:.9rem 1.1rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.cat-card:hover{border-color:var(--teal-light);box-shadow:0 4px 14px var(--shadow);transform:translateY(-2px);background:#fff;}
+.cat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--teal-light),var(--teal));opacity:0;transition:opacity .2s;}
+.cat-card:hover::before{opacity:1;}
+.cc-no{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--teal-dark);margin-bottom:.18rem;}
+.cc-name{font-size:.8rem;color:var(--text);font-weight:500;line-height:1.35;}
+.cc-meta{font-size:.67rem;color:var(--text3);margin-top:.28rem;}
+.btag{display:inline-block;padding:.16rem .5rem;border-radius:5px;font-size:.7rem;font-weight:700;background:var(--teal-pale);color:var(--teal-dark);}
+
+#tableView{display:none;}
+.tbl-box{background:#fff;border-radius:14px;border:1.5px solid var(--border2);overflow:hidden;box-shadow:0 2px 14px var(--shadow);}
+.tbl-top{padding:.85rem 1.4rem;background:var(--teal-xpale);border-bottom:1.5px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.tbl-top span{font-size:.78rem;color:var(--teal-dark);font-weight:600;}
+.tscroll{max-height:520px;overflow-y:auto;}
+.tscroll::-webkit-scrollbar{width:5px;}
+.tscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+table{width:100%;border-collapse:collapse;}
+thead th{position:sticky;top:0;background:#fff;padding:.65rem 1.2rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:700;border-bottom:1.5px solid var(--border2);}
+tbody tr{border-bottom:1px solid var(--border2);transition:background .15s;cursor:pointer;}
+tbody tr:hover{background:var(--teal-xpale);}
+tbody td{padding:.65rem 1.2rem;font-size:.85rem;}
+.td-r{font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--teal-dark);}
+.td-n{color:var(--text);font-weight:500;}
+.cpill{display:inline-block;padding:.16rem .5rem;border-radius:5px;font-size:.7rem;font-weight:600;}
+.type-lab{background:#dcfce7;color:#14532d;}
+.type-class{background:#dbeafe;color:#1e3a8a;}
+.type-office{background:#fef3c7;color:#78350f;}
+.type-faculty{background:#fce7f3;color:#831843;}
+.type-hall{background:#ede9fe;color:#4c1d95;}
+.type-wash{background:#e0f2fe;color:#0c4a6e;}
+.type-store{background:#fee2e2;color:#7f1d1d;}
+.type-misc{background:#f1f5f9;color:#475569;}
+.flrtag{display:inline-block;padding:.16rem .5rem;border-radius:5px;font-size:.7rem;font-weight:600;background:#fef9c3;color:#854d0e;}
+
+mark{background:rgba(13,148,136,.18);color:var(--teal-dark);border-radius:3px;padding:0 2px;}
+
+.float-btns{position:fixed;bottom:1.8rem;right:1.8rem;display:flex;flex-direction:column;gap:.6rem;z-index:200;}
+.fb{width:56px;height:56px;border-radius:50%;border:none;font-family:'DM Serif Display',serif;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,.18);transition:all .25s;position:relative;}
+.fb-ab1{background:linear-gradient(135deg,var(--teal-dark),var(--teal));color:#fff;}
+.fb-ab2{background:#fff;color:var(--teal-dark);border:2.5px solid var(--teal-light);}
+.fb.active-f{box-shadow:0 5px 20px var(--shadow2),0 0 0 4px var(--teal-pale);transform:scale(1.08);}
+.fb:hover{transform:scale(1.1);}
+.fb-tip{position:absolute;right:64px;top:50%;transform:translateY(-50%);background:var(--text);color:#fff;padding:.28rem .65rem;border-radius:7px;font-size:.68rem;font-family:'DM Sans',sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;}
+.fb-tip::after{content:'';position:absolute;left:100%;top:50%;transform:translateY(-50%);border:5px solid transparent;border-left-color:var(--text);}
+.fb:hover .fb-tip{opacity:1;}
+
+@media(max-width:768px){
+  .kpis{display:none;}
+  .main{padding:1.4rem 1rem 6rem;}
+  .search-band{padding:1.8rem 1rem 3rem;}
+  #flashWrap,#multiWrap,#noResult{padding:0 1rem;}
+  .cat-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-mark">🏛️</div>
+      <div class="logo-text">
+        <h1>Room Directory</h1>
+        <p>Academic Blocks AB-1 &amp; AB-2</p>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="n" id="kTotal">—</div><div class="l">Total</div></div>
+      <div class="kpi"><div class="n" id="kLabs">—</div><div class="l">Labs</div></div>
+      <div class="kpi"><div class="n" id="kClass">—</div><div class="l">Classrooms</div></div>
+      <div class="kpi"><div class="n" id="kOffice">—</div><div class="l">Offices</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="search-band">
+  <div class="s-inner">
+    <div class="s-title">Find any room instantly</div>
+    <div class="s-box">
+      <span class="s-ico">🔍</span>
+      <input type="text" id="sInput" placeholder="Room no. or name — e.g. 301, G 103, Lab, Seminar…" autocomplete="off" spellcheck="false"/>
+      <button class="s-clr" id="sClear">✕</button>
+    </div>
+  </div>
+</div>
+
+<div id="flashWrap">
+  <div class="flash-card">
+    <div class="f-badge"><div class="fn" id="fNo"></div><div class="fl">Room</div></div>
+    <div class="f-info">
+      <div class="f-found">✓ Room Located</div>
+      <div class="f-name" id="fName"></div>
+      <div class="f-tags">
+        <span class="ftag b" id="fBldg"></span>
+        <span class="ftag f" id="fFlr"></span>
+        <span class="ftag c" id="fCat"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="multiWrap">
+  <div class="m-label" id="mLabel"></div>
+  <div class="m-grid" id="mGrid"></div>
+</div>
+
+<div id="noResult"><div class="no-box" id="noBox"></div></div>
+
+<div class="main">
+  <div class="view-tabs">
+    <button class="tab-btn active" onclick="switchView('dash',this)">📊 Dashboard</button>
+    <button class="tab-btn" onclick="switchView('table',this)">📋 All Rooms</button>
+  </div>
+
+  <div id="dashView">
+    <div id="catSections"></div>
+  </div>
+
+  <div id="tableView">
+    <div class="tbl-box">
+      <div class="tbl-top">
+        <span id="tblTitle">🟢 All Rooms</span>
+        <span id="tblCount"></span>
+      </div>
+      <div class="tscroll">
+        <table>
+          <thead><tr>
+            <th>Room No.</th><th>Name / Area</th><th>Category</th><th>Building</th><th>Floor</th>
+          </tr></thead>
+          <tbody id="tBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="float-btns">
+  <button class="fb fb-ab1" id="fbAB1" onclick="filterBuilding('AB-1',this)">AB1<span class="fb-tip">Academic Block 1</span></button>
+  <button class="fb fb-ab2" id="fbAB2" onclick="filterBuilding('AB-2',this)">AB2<span class="fb-tip">Academic Block 2</span></button>
+</div>
+
+<script>
+const ROOMS=[{"building":"AB-2","floor":"Cellar","room_no":"B 01","room_name":"Academic Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 02","room_name":"Estate Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 03","room_name":"Sports Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 04","room_name":"Hospitality HOD's Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 05","room_name":"Hon: President'S Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 06","room_name":"Hospitality Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 07","room_name":"Project Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 08","room_name":"Surveying Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 09","room_name":"Men's Washroom"},{"building":"AB-2","floor":"Cellar","room_no":"B 10","room_name":"Project Store"},{"building":"AB-2","floor":"Cellar","room_no":"B 11","room_name":"3D printing Design Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 12","room_name":"Mechanical Workshop"},{"building":"AB-2","floor":"Cellar","room_no":"B 13","room_name":"Highway Engineering Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 14","room_name":"Geo Technical Engineering Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 15","room_name":"Environmental Engineering Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 16","room_name":"Machine Shop Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 17","room_name":"Concrete tech NDT Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 18","room_name":"Mechanical Engineering I & 2 Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 19","room_name":"Electrical Machines Lab-1"},{"building":"AB-2","floor":"Cellar","room_no":"B 20","room_name":"Electric Vehicle (EV) Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 21","room_name":"Electrical Machines Lab-2"},{"building":"AB-2","floor":"Cellar","room_no":"B 22","room_name":"Fluid Mechanics & Hydraulics Lab"},{"building":"AB-2","floor":"Cellar","room_no":"B 23","room_name":"Mechanics of Solids Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 24","room_name":"TEPE Lab"},{"building":"AB-2","floor":"Cellar","room_no":"B 25","room_name":"Electrical Workshop Lab"},{"building":"AB-2","floor":"Cellar","room_no":"B 26","room_name":"F & B Store"},{"building":"AB-2","floor":"Cellar","room_no":"B 27","room_name":"Exam Cell Store"},{"building":"AB-2","floor":"Cellar","room_no":"B 28","room_name":"Housekeeping Store"},{"building":"AB-2","floor":"Cellar","room_no":"B 29","room_name":"Cats Store"},{"building":"AB-2","floor":"Cellar","room_no":"B 30","room_name":"Purchase Office"},{"building":"AB-2","floor":"Cellar","room_no":"B 31","room_name":"Staff Dining"},{"building":"AB-2","floor":"Cellar","room_no":"B 32","room_name":"Dance Studio"},{"building":"AB-2","floor":"Cellar","room_no":"B 33","room_name":"Numerical & Finite Element Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 34","room_name":"Manufacturing Technology Laboratory"},{"building":"AB-2","floor":"Cellar","room_no":"B 35","room_name":"Heat & Mass Transfer Laboratory"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 101","room_name":"Exam Cell"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 102","room_name":"Department of Finance"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 103","room_name":"Director's Office"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 104","room_name":"GST Director Office"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 105","room_name":"Pro VC Board Room"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 106","room_name":"Pro VC Office"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 107","room_name":"Shivaji Auditorium"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 108","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 109","room_name":"VDC"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 110","room_name":"Spoorti Lab (CGC)"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 111","room_name":"CGC Director Room"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 112","room_name":"CGC Office"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 113","room_name":"Men's Washroom"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 114","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 115","room_name":"CGC Discussion Room 1"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 116","room_name":"CGC Discussion Room 2"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 117","room_name":"CGC Discussion Room 3"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 118","room_name":"Men's Washroom"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 119","room_name":"CAIA Office"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 120","room_name":"CGC Interview Cubicle"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 121","room_name":"CAIA Director Office"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 122","room_name":"Graces Hall"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 123","room_name":"Dining Room"},{"building":"AB-2","floor":"Ground Floor","room_no":"G 124","room_name":"Internal Quality Assurance Cell"},{"building":"AB-2","floor":"1st Floor","room_no":"101","room_name":"Knowledge Resource Centre"},{"building":"AB-2","floor":"1st Floor","room_no":"102","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"1st Floor","room_no":"103","room_name":"Men's Washroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"201","room_name":"Murti Lab"},{"building":"AB-2","floor":"2nd Floor","room_no":"202","room_name":"Serina Technology Robotics R&D Lab"},{"building":"AB-2","floor":"2nd Floor","room_no":"203","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"204","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"205","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"206","room_name":"Robotics & AC Centre of Excellence"},{"building":"AB-2","floor":"2nd Floor","room_no":"207","room_name":"Faculty Room"},{"building":"AB-2","floor":"2nd Floor","room_no":"208","room_name":"Faculty Room"},{"building":"AB-2","floor":"2nd Floor","room_no":"209","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"210","room_name":"H.O.D Cabin Mechanical Engineering"},{"building":"AB-2","floor":"2nd Floor","room_no":"211","room_name":"Faculty Room"},{"building":"AB-2","floor":"2nd Floor","room_no":"212","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"213","room_name":"Smart Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"214","room_name":"Smart Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"215","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"216","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"217","room_name":"Smart Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"218","room_name":"Smart Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"219","room_name":"Smart Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"220","room_name":"Faculty Room"},{"building":"AB-2","floor":"2nd Floor","room_no":"221","room_name":"Men's Washroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"222","room_name":"HoD Civil Engineering"},{"building":"AB-2","floor":"2nd Floor","room_no":"223","room_name":"Faculty Room"},{"building":"AB-2","floor":"2nd Floor","room_no":"224","room_name":"Men's Washroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"225","room_name":"Abraham Karem Drone Technology Lab"},{"building":"AB-2","floor":"2nd Floor","room_no":"226","room_name":"Kevin Ashton IOT Innovation Lab"},{"building":"AB-2","floor":"2nd Floor","room_no":"227","room_name":"Vacant"},{"building":"AB-2","floor":"2nd Floor","room_no":"228","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"229","room_name":"Classroom"},{"building":"AB-2","floor":"2nd Floor","room_no":"230","room_name":"Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"301","room_name":"Seminar Hall"},{"building":"AB-2","floor":"3rd Floor","room_no":"302","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"303","room_name":"H.O.D Office EECE"},{"building":"AB-2","floor":"3rd Floor","room_no":"304","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"305","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"306","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"307","room_name":"VLSI Lab"},{"building":"AB-2","floor":"3rd Floor","room_no":"308","room_name":"Faculty Room"},{"building":"AB-2","floor":"3rd Floor","room_no":"309","room_name":"Hardware Software Programming Lab"},{"building":"AB-2","floor":"3rd Floor","room_no":"310","room_name":"Faculty Room"},{"building":"AB-2","floor":"3rd Floor","room_no":"311","room_name":"Digital System Laboratory"},{"building":"AB-2","floor":"3rd Floor","room_no":"312","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"313","room_name":"NCC"},{"building":"AB-2","floor":"3rd Floor","room_no":"314","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"315","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"316","room_name":"Faculty Room"},{"building":"AB-2","floor":"3rd Floor","room_no":"317","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"318","room_name":"Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"319","room_name":"Power Electronics Control System Lab"},{"building":"AB-2","floor":"3rd Floor","room_no":"320","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"321","room_name":"Electronics Lab"},{"building":"AB-2","floor":"3rd Floor","room_no":"322","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"323","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"324","room_name":"Faculty Room"},{"building":"AB-2","floor":"3rd Floor","room_no":"325","room_name":"Mens Washroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"326","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"327","room_name":"Mens Washroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"328","room_name":"Accounts Store"},{"building":"AB-2","floor":"3rd Floor","room_no":"329","room_name":"Circuit Lab-1"},{"building":"AB-2","floor":"3rd Floor","room_no":"330","room_name":"JC Bose Laboratory"},{"building":"AB-2","floor":"3rd Floor","room_no":"331","room_name":"Circuit Lab-2"},{"building":"AB-2","floor":"3rd Floor","room_no":"332","room_name":"Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"333","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"334","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"335","room_name":"Smart Classroom"},{"building":"AB-2","floor":"3rd Floor","room_no":"336","room_name":"Professor Room CSE"},{"building":"AB-2","floor":"3rd Floor","room_no":"337","room_name":"Smart Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"401","room_name":"Drone Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"402","room_name":"Networking Technologies Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"403","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"404","room_name":"Research & Development Cell"},{"building":"AB-2","floor":"4th Floor","room_no":"405","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"406","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"407","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"408","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"409","room_name":"Van Rossum Python Programming Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"410","room_name":"Faculty Room"},{"building":"AB-2","floor":"4th Floor","room_no":"411","room_name":"Faculty Room"},{"building":"AB-2","floor":"4th Floor","room_no":"412","room_name":"Ramanujam Computational Networking Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"413","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"4th Floor","room_no":"414","room_name":"NSS Office"},{"building":"AB-2","floor":"4th Floor","room_no":"415","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"416","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"4th Floor","room_no":"417","room_name":"CSE AI HOD & Professor Room"},{"building":"AB-2","floor":"4th Floor","room_no":"418","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"419","room_name":"Bob Thomas Security Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"420","room_name":"Dr. APJ Abdul Kalam Advanced Research Laboratory"},{"building":"AB-2","floor":"4th Floor","room_no":"421","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"422","room_name":"Jaron Lanier Smart Arena"},{"building":"AB-2","floor":"4th Floor","room_no":"423","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"424","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"425","room_name":"Faculty Room"},{"building":"AB-2","floor":"4th Floor","room_no":"426","room_name":"Men's Washroom"},{"building":"AB-2","floor":"4th Floor","room_no":"427","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"428","room_name":"Men's Washroom"},{"building":"AB-2","floor":"4th Floor","room_no":"429","room_name":"Professor Room"},{"building":"AB-2","floor":"4th Floor","room_no":"430","room_name":"Development Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"431","room_name":"Narayana Murthy Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"432","room_name":"John McCarthy AI & Project Development Lab"},{"building":"AB-2","floor":"4th Floor","room_no":"433","room_name":"Faculty Room"},{"building":"AB-2","floor":"4th Floor","room_no":"434","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"435","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"436","room_name":"Classroom"},{"building":"AB-2","floor":"4th Floor","room_no":"437","room_name":"AV Panel Room"},{"building":"AB-2","floor":"4th Floor","room_no":"438","room_name":"Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"501","room_name":"Seminar Hall"},{"building":"AB-2","floor":"5th Floor","room_no":"502","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"503","room_name":"Professor Room CSE"},{"building":"AB-2","floor":"5th Floor","room_no":"504","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"505","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"506","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"507","room_name":"Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"508","room_name":"Nandan Nilekani Database Lab"},{"building":"AB-2","floor":"5th Floor","room_no":"509","room_name":"Faculty Room"},{"building":"AB-2","floor":"5th Floor","room_no":"510","room_name":"Faculty Room"},{"building":"AB-2","floor":"5th Floor","room_no":"511","room_name":"Bjarne Stroustrup Programming Lab"},{"building":"AB-2","floor":"5th Floor","room_no":"512","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"5th Floor","room_no":"513","room_name":"CSE Records Room"},{"building":"AB-2","floor":"5th Floor","room_no":"514","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"515","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"5th Floor","room_no":"516","room_name":"CSE HOD Office"},{"building":"AB-2","floor":"5th Floor","room_no":"517","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"518","room_name":"Babbage Computer Engineering Workshop"},{"building":"AB-2","floor":"5th Floor","room_no":"519","room_name":"Faculty Room"},{"building":"AB-2","floor":"5th Floor","room_no":"520","room_name":"Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"521","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"522","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"523","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"524","room_name":"Faculty Room"},{"building":"AB-2","floor":"5th Floor","room_no":"525","room_name":"Men's Washroom"},{"building":"AB-2","floor":"5th Floor","room_no":"526","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"527","room_name":"Men's Washroom"},{"building":"AB-2","floor":"5th Floor","room_no":"528","room_name":"CSE Library"},{"building":"AB-2","floor":"5th Floor","room_no":"529","room_name":"Turning Laboratory"},{"building":"AB-2","floor":"5th Floor","room_no":"530","room_name":"Tim Berners Web Development Lab"},{"building":"AB-2","floor":"5th Floor","room_no":"531","room_name":"Bachman Laboratory"},{"building":"AB-2","floor":"5th Floor","room_no":"532","room_name":"Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"533","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"534","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"535","room_name":"Smart Classroom"},{"building":"AB-2","floor":"5th Floor","room_no":"536","room_name":"Faculty Room"},{"building":"AB-2","floor":"5th Floor","room_no":"537","room_name":"Smart Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"601","room_name":"Student Life Counselling Room"},{"building":"AB-2","floor":"6th Floor","room_no":"602","room_name":"Student Life Director Cabin & Office"},{"building":"AB-2","floor":"6th Floor","room_no":"603","room_name":"Office for BTech Beginnings"},{"building":"AB-2","floor":"6th Floor","room_no":"604","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"605","room_name":"Marketing Office"},{"building":"AB-2","floor":"6th Floor","room_no":"606","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"607","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"608","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"609","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"610","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"611","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"612","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"613","room_name":"Faculty Room"},{"building":"AB-2","floor":"6th Floor","room_no":"614","room_name":"Faculty Room"},{"building":"AB-2","floor":"6th Floor","room_no":"615","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"616","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"6th Floor","room_no":"617","room_name":"Wellness Room"},{"building":"AB-2","floor":"6th Floor","room_no":"618","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"619","room_name":"Woman's Washroom"},{"building":"AB-2","floor":"6th Floor","room_no":"620","room_name":"CATS Store"},{"building":"AB-2","floor":"6th Floor","room_no":"621","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"622","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"623","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"624","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"625","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"626","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"627","room_name":"Centre for Research"},{"building":"AB-2","floor":"6th Floor","room_no":"628","room_name":"CATS Office"},{"building":"AB-2","floor":"6th Floor","room_no":"629","room_name":"Men's Washroom"},{"building":"AB-2","floor":"6th Floor","room_no":"630","room_name":"IT Manager Office"},{"building":"AB-2","floor":"6th Floor","room_no":"631","room_name":"AV Office"},{"building":"AB-2","floor":"6th Floor","room_no":"632","room_name":"Men's Washroom"},{"building":"AB-2","floor":"6th Floor","room_no":"633","room_name":"Multi Sensor Image Fusion Laboratory"},{"building":"AB-2","floor":"6th Floor","room_no":"634","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"635","room_name":"Language Laboratory"},{"building":"AB-2","floor":"6th Floor","room_no":"636","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"637","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"638","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"639","room_name":"Classroom 30 Seater"},{"building":"AB-2","floor":"6th Floor","room_no":"640","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"641","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"642","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"643","room_name":"Classroom"},{"building":"AB-2","floor":"6th Floor","room_no":"644","room_name":"Classroom"},{"building":"AB-1","floor":"Cellar","room_no":"B 01","room_name":"Chemistry Lab"},{"building":"AB-1","floor":"Cellar","room_no":"B 02","room_name":"Pest Control"},{"building":"AB-1","floor":"Cellar","room_no":"B 03","room_name":"Talbot Office"},{"building":"AB-1","floor":"Cellar","room_no":"B 04","room_name":"Jan-Pro Office"},{"building":"AB-1","floor":"Cellar","room_no":"B 05","room_name":"Engineering Store"},{"building":"AB-1","floor":"Cellar","room_no":"B 06","room_name":"Engineering Store / Uniform Room"},{"building":"AB-1","floor":"Cellar","room_no":"B 07","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"Cellar","room_no":"B 08","room_name":"Men's Washroom"},{"building":"AB-1","floor":"Cellar","room_no":"B 09","room_name":"Fitness Centre"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 01","room_name":"Admission Office"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 02","room_name":"Men's Washroom"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 03","room_name":"Engineering Chemistry Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 04","room_name":"Electrochemical Energy & Sensor Research Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 05","room_name":"M.Sc Physics Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 06","room_name":"Engineering Physics Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 07","room_name":"Optics Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 08","room_name":"Central Instrumental Facility-3"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 09","room_name":"Analytical Chemistry Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 10","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 11","room_name":"Electronic Quantum Matter Laboratory"},{"building":"AB-1","floor":"Ground Floor","room_no":"G 12","room_name":"General Physics Laboratory"},{"building":"AB-1","floor":"1st Floor","room_no":"101","room_name":"Vacant"},{"building":"AB-1","floor":"1st Floor","room_no":"102","room_name":"Men's Washroom"},{"building":"AB-1","floor":"1st Floor","room_no":"103","room_name":"Classroom"},{"building":"AB-1","floor":"1st Floor","room_no":"104","room_name":"Classroom"},{"building":"AB-1","floor":"1st Floor","room_no":"105","room_name":"HoD Room - Department Of English"},{"building":"AB-1","floor":"1st Floor","room_no":"106","room_name":"Faculty Room"},{"building":"AB-1","floor":"1st Floor","room_no":"107","room_name":"Classroom"},{"building":"AB-1","floor":"1st Floor","room_no":"108","room_name":"Classroom"},{"building":"AB-1","floor":"1st Floor","room_no":"109","room_name":"Faculty Room"},{"building":"AB-1","floor":"1st Floor","room_no":"110","room_name":"Professor Room - Department Of Chemistry"},{"building":"AB-1","floor":"1st Floor","room_no":"111","room_name":"Classroom"},{"building":"AB-1","floor":"1st Floor","room_no":"112","room_name":"Psychology Lab"},{"building":"AB-1","floor":"1st Floor","room_no":"113","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"1st Floor","room_no":"114","room_name":"Centre for Research"},{"building":"AB-1","floor":"1st Floor","room_no":"115","room_name":"Board Room"},{"building":"AB-1","floor":"1st Floor","room_no":"116","room_name":"Principal Cabin (GSS)"},{"building":"AB-1","floor":"1st Floor","room_no":"117","room_name":"GSS Department Office"},{"building":"AB-1","floor":"2nd Floor","room_no":"201","room_name":"Vacant"},{"building":"AB-1","floor":"2nd Floor","room_no":"202","room_name":"Men's Washroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"203","room_name":"Smart Classroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"204","room_name":"Smart Classroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"205","room_name":"Security Office"},{"building":"AB-1","floor":"2nd Floor","room_no":"206","room_name":"Faculty Room"},{"building":"AB-1","floor":"2nd Floor","room_no":"207","room_name":"Smart Classroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"208","room_name":"Smart Classroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"209","room_name":"Faculty Room"},{"building":"AB-1","floor":"2nd Floor","room_no":"210","room_name":"HoD Room - Department Of Physics"},{"building":"AB-1","floor":"2nd Floor","room_no":"211","room_name":"Smart Classroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"212","room_name":"Smart Classroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"213","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"2nd Floor","room_no":"214","room_name":"Language Laboratory - Department Of English"},{"building":"AB-1","floor":"2nd Floor","room_no":"215","room_name":"Director Cabin - School Of Humanities"},{"building":"AB-1","floor":"2nd Floor","room_no":"216","room_name":"School Of Humanities & Social Sciences Office"},{"building":"AB-1","floor":"3rd Floor","room_no":"301","room_name":"GSBB Computer Lab"},{"building":"AB-1","floor":"3rd Floor","room_no":"302","room_name":"Men's Washroom"},{"building":"AB-1","floor":"3rd Floor","room_no":"303","room_name":"Smart Classroom"},{"building":"AB-1","floor":"3rd Floor","room_no":"304","room_name":"Smart Classroom"},{"building":"AB-1","floor":"3rd Floor","room_no":"305","room_name":"HoD Department of Computer Science"},{"building":"AB-1","floor":"3rd Floor","room_no":"306","room_name":"Faculty Room"},{"building":"AB-1","floor":"3rd Floor","room_no":"307","room_name":"Classroom 30 Seater"},{"building":"AB-1","floor":"3rd Floor","room_no":"308","room_name":"Classroom 30 Seater"},{"building":"AB-1","floor":"3rd Floor","room_no":"309","room_name":"Classroom 30 Seater"},{"building":"AB-1","floor":"3rd Floor","room_no":"310","room_name":"Faculty Room"},{"building":"AB-1","floor":"3rd Floor","room_no":"311","room_name":"Professor Room GSB"},{"building":"AB-1","floor":"3rd Floor","room_no":"312","room_name":"Smart Classroom"},{"building":"AB-1","floor":"3rd Floor","room_no":"313","room_name":"Smart Classroom"},{"building":"AB-1","floor":"3rd Floor","room_no":"314","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"3rd Floor","room_no":"315","room_name":"Seminar Hall"},{"building":"AB-1","floor":"3rd Floor","room_no":"316","room_name":"Director Cabin - School Of Business"},{"building":"AB-1","floor":"3rd Floor","room_no":"317","room_name":"School Of Business Department Office"},{"building":"AB-1","floor":"4th Floor","room_no":"401","room_name":"Engineering Graphics Laboratory"},{"building":"AB-1","floor":"4th Floor","room_no":"402","room_name":"Men's Washroom"},{"building":"AB-1","floor":"4th Floor","room_no":"403","room_name":"Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"404","room_name":"Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"405","room_name":"Centre For Research (GSHS)"},{"building":"AB-1","floor":"4th Floor","room_no":"406","room_name":"Faculty Room"},{"building":"AB-1","floor":"4th Floor","room_no":"407","room_name":"Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"408","room_name":"Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"409","room_name":"Faculty Room"},{"building":"AB-1","floor":"4th Floor","room_no":"410","room_name":"Centre For Research"},{"building":"AB-1","floor":"4th Floor","room_no":"411","room_name":"Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"412","room_name":"Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"413","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"4th Floor","room_no":"414","room_name":"Horseshoe Classroom"},{"building":"AB-1","floor":"4th Floor","room_no":"415","room_name":"HoD Room GSB"},{"building":"AB-1","floor":"4th Floor","room_no":"416","room_name":"Faculty Room"},{"building":"AB-1","floor":"5th Floor","room_no":"501","room_name":"Horseshoe Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"502","room_name":"Men's Washroom"},{"building":"AB-1","floor":"5th Floor","room_no":"503","room_name":"Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"504","room_name":"Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"505","room_name":"HoD - Department Of Life Science"},{"building":"AB-1","floor":"5th Floor","room_no":"506","room_name":"Faculty Room"},{"building":"AB-1","floor":"5th Floor","room_no":"507","room_name":"Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"508","room_name":"Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"509","room_name":"Faculty Room"},{"building":"AB-1","floor":"5th Floor","room_no":"510","room_name":"Professor Room - School Of Business"},{"building":"AB-1","floor":"5th Floor","room_no":"511","room_name":"Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"512","room_name":"Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"513","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"5th Floor","room_no":"514","room_name":"Horseshoe Classroom"},{"building":"AB-1","floor":"5th Floor","room_no":"515","room_name":"HoD Room - Department Of Mathematics"},{"building":"AB-1","floor":"5th Floor","room_no":"516","room_name":"Faculty Room"},{"building":"AB-1","floor":"6th Floor","room_no":"601","room_name":"Science Research Lab"},{"building":"AB-1","floor":"6th Floor","room_no":"602","room_name":"Men's Washroom"},{"building":"AB-1","floor":"6th Floor","room_no":"603","room_name":"Advance Material Synthesis Research Lab"},{"building":"AB-1","floor":"6th Floor","room_no":"604","room_name":"Central Instrument Facility-2"},{"building":"AB-1","floor":"6th Floor","room_no":"605","room_name":"Material Physics Research Lab"},{"building":"AB-1","floor":"6th Floor","room_no":"606","room_name":"Faculty Room"},{"building":"AB-1","floor":"6th Floor","room_no":"607","room_name":"Food Science Technology & Microbiology Laboratory"},{"building":"AB-1","floor":"6th Floor","room_no":"608","room_name":"Faculty Room"},{"building":"AB-1","floor":"6th Floor","room_no":"609","room_name":"Sterilization Room"},{"building":"AB-1","floor":"6th Floor","room_no":"610","room_name":"Central Instrument Facility-1"},{"building":"AB-1","floor":"6th Floor","room_no":"611","room_name":"Woman's Washroom"},{"building":"AB-1","floor":"6th Floor","room_no":"612","room_name":"Instrumental Chemical Product Development Centre"},{"building":"AB-1","floor":"6th Floor","room_no":"613","room_name":"Directorate Of Human Resource"},{"building":"AB-1","floor":"6th Floor","room_no":"614","room_name":"HoD - Department Of Chemistry"},{"building":"AB-1","floor":"6th Floor","room_no":"615","room_name":"Faculty Room"}];
+
+function categorize(r){
+  const n=r.room_name.toLowerCase();
+  if(/lab|laboratory|workshop|facility|studio|arena/.test(n)) return 'Lab';
+  if(/classroom|class room|horseshoe|smart class|smartclass/.test(n)) return 'Classroom';
+  if(/washroom|restroom|toilet/.test(n)) return 'Washroom';
+  if(/faculty room/.test(n)) return 'Faculty Room';
+  if(/office|cabin|director|hod|department|exam cell|caia|cgc|cats|nss|it manager|marketing|admission|purchase/.test(n)) return 'Office';
+  if(/seminar|auditorium|hall|board room|boardroom|discussion room|dining/.test(n)) return 'Hall';
+  if(/store|storage|housekeeping|uniform/.test(n)) return 'Store';
+  return 'Other';
+}
+
+const CATS={
+  'Lab':         {icon:'🔬',pill:'type-lab'},
+  'Classroom':   {icon:'🏫',pill:'type-class'},
+  'Office':      {icon:'🏢',pill:'type-office'},
+  'Faculty Room':{icon:'👨\u200d🏫',pill:'type-faculty'},
+  'Hall':        {icon:'🎭',pill:'type-hall'},
+  'Washroom':    {icon:'🚻',pill:'type-wash'},
+  'Store':       {icon:'📦',pill:'type-store'},
+  'Other':       {icon:'📌',pill:'type-misc'},
+};
+const CAT_ORDER=['Lab','Classroom','Hall','Office','Faculty Room','Store','Washroom','Other'];
+const enriched=ROOMS.map(r=>({...r,category:categorize(r)}));
+
+let activeBuilding='both', currentView='dash', debounce=null;
+
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function highlight(t,q){if(!q)return esc(t);return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');}
+
+function updateKPIs(rooms){
+  document.getElementById('kTotal').textContent=rooms.length;
+  document.getElementById('kLabs').textContent=rooms.filter(r=>r.category==='Lab').length;
+  document.getElementById('kClass').textContent=rooms.filter(r=>r.category==='Classroom').length;
+  document.getElementById('kOffice').textContent=rooms.filter(r=>r.category==='Office').length;
+}
+
+function getVisible(){
+  return activeBuilding==='both'?enriched:enriched.filter(r=>r.building===activeBuilding);
+}
+
+function doFlash(r){
+  document.getElementById('fNo').textContent=r.room_no;
+  document.getElementById('fName').textContent=r.room_name;
+  document.getElementById('fBldg').textContent=r.building;
+  document.getElementById('fFlr').textContent=r.floor;
+  document.getElementById('fCat').textContent=r.category;
+  var fw=document.getElementById('flashWrap');
+  fw.style.display='block';
+  var fc=fw.querySelector('.flash-card');
+  fc.style.animation='none';fc.offsetWidth;fc.style.animation='popIn .35s cubic-bezier(.34,1.56,.64,1)';
+  document.getElementById('multiWrap').style.display='none';
+  document.getElementById('noResult').style.display='none';
+  fw.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function toggleAcc(id){
+  var body=document.getElementById('body_'+id);
+  var hdr=document.getElementById('hdr_'+id);
+  var open=body.classList.contains('is-open');
+  body.classList.toggle('is-open',!open);
+  hdr.classList.toggle('is-open',!open);
+}
+
+function renderDash(rooms){
+  if(!rooms) rooms=getVisible();
+  updateKPIs(rooms);
+  var html='';
+  CAT_ORDER.forEach(function(cat){
+    var cr=rooms.filter(function(r){return r.category===cat;});
+    if(!cr.length) return;
+    var meta=CATS[cat];
+    var id=cat.replace(/\s+/g,'_');
+    var cards=cr.map(function(r){
+      var d=JSON.stringify(r).replace(/'/g,"\\'");
+      return '<div class="cat-card" onclick="doFlash('+d+')">'
+        +'<div class="cc-no">'+esc(r.room_no)+'</div>'
+        +'<div class="cc-name">'+esc(r.room_name)+'</div>'
+        +'<div class="cc-meta"><span class="btag">'+esc(r.building)+'</span> '+esc(r.floor)+'</div>'
+        +'</div>';
+    }).join('');
+    html+='<div class="dash-sec">'
+      +'<div class="acc-hdr" id="hdr_'+id+'" onclick="toggleAcc(\''+id+'\')">'
+      +'<div class="acc-icon">'+meta.icon+'</div>'
+      +'<span class="acc-label">'+cat+'s</span>'
+      +'<span class="acc-count">'+cr.length+'</span>'
+      +'<span class="acc-arrow">▼</span>'
+      +'</div>'
+      +'<div class="acc-body" id="body_'+id+'">'
+      +'<div class="acc-inner"><div class="cat-grid">'+cards+'</div></div>'
+      +'</div>'
+      +'</div>';
+  });
+  document.getElementById('catSections').innerHTML=html;
+}
+
+function renderTable(rooms,q){
+  q=q||'';
+  document.getElementById('tblCount').textContent=rooms.length+' rooms';
+  document.getElementById('tBody').innerHTML=rooms.map(function(r){
+    var meta=CATS[r.category]||CATS['Other'];
+    return '<tr onclick="doFlash('+JSON.stringify(r).replace(/"/g,'&quot;')+')">'
+      +'<td class="td-r">'+highlight(r.room_no,q)+'</td>'
+      +'<td class="td-n">'+highlight(r.room_name,q)+'</td>'
+      +'<td><span class="cpill '+meta.pill+'">'+meta.icon+' '+r.category+'</span></td>'
+      +'<td><span class="btag">'+esc(r.building)+'</span></td>'
+      +'<td><span class="flrtag">'+esc(r.floor)+'</span></td>'
+      +'</tr>';
+  }).join('');
+}
+
+function switchView(v,btn){
+  currentView=v;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('dashView').style.display=v==='dash'?'block':'none';
+  document.getElementById('tableView').style.display=v==='table'?'block':'none';
+  var rooms=getVisible();
+  if(v==='table') renderTable(rooms,''); else renderDash(rooms);
+}
+
+function filterBuilding(b,btn){
+  activeBuilding=activeBuilding===b?'both':b;
+  document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('active-f');});
+  if(activeBuilding!=='both') btn.classList.add('active-f');
+  document.getElementById('tblTitle').textContent=activeBuilding==='both'?'🟢 All Rooms':'🟢 '+activeBuilding;
+  document.getElementById('flashWrap').style.display='none';
+  document.getElementById('multiWrap').style.display='none';
+  document.getElementById('noResult').style.display='none';
+  document.getElementById('sInput').value='';
+  document.getElementById('sClear').style.display='none';
+  var rooms=getVisible();
+  if(currentView==='dash') renderDash(rooms); else renderTable(rooms,'');
+}
+
+function doSearch(val){
+  var q=val.trim();
+  var fw=document.getElementById('flashWrap');
+  var mw=document.getElementById('multiWrap');
+  var nr=document.getElementById('noResult');
+  document.getElementById('sClear').style.display=q?'block':'none';
+  if(!q){
+    fw.style.display=mw.style.display=nr.style.display='none';
+    var rooms=getVisible();
+    if(currentView==='dash') renderDash(rooms); else renderTable(rooms,'');
+    return;
+  }
+  var ql=q.toLowerCase().replace(/\s+/g,'');
+  var exact=enriched.filter(function(r){return r.room_no.toLowerCase().replace(/\s+/g,'')==ql;});
+  var partial=enriched.filter(function(r){
+    return r.room_no.toLowerCase().includes(q.toLowerCase())||r.room_name.toLowerCase().includes(q.toLowerCase());
+  });
+  if(exact.length===1){
+    doFlash(exact[0]);mw.style.display=nr.style.display='none';
+  } else if(exact.length>1){
+    fw.style.display='none';nr.style.display='none';mw.style.display='block';
+    document.getElementById('mLabel').textContent=exact.length+' matches — tap to select';
+    document.getElementById('mGrid').innerHTML=exact.map(function(r){
+      return '<div class="mini-card" onclick="doFlash('+JSON.stringify(r).replace(/"/g,'&quot;')+')">'
+        +'<div class="m-badge">'+esc(r.room_no)+'</div>'
+        +'<div><div class="m-name">'+esc(r.room_name)+'</div><div class="m-sub">'+esc(r.building)+' · '+esc(r.floor)+'</div></div>'
+        +'</div>';
+    }).join('');
+  } else if(!partial.length){
+    fw.style.display=mw.style.display='none';nr.style.display='block';
+    document.getElementById('noBox').textContent='No rooms found for "'+q+'"';
+  } else {
+    fw.style.display=mw.style.display=nr.style.display='none';
+  }
+  if(currentView==='table') renderTable(partial,q); else renderDash(partial);
+}
+
+document.getElementById('sInput').addEventListener('input',function(e){clearTimeout(debounce);debounce=setTimeout(function(){doSearch(e.target.value);},150);});
+document.getElementById('sInput').addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('sInput').value='';doSearch('');}});
+document.getElementById('sClear').addEventListener('click',function(){document.getElementById('sInput').value='';doSearch('');});
+
+renderDash();
+</script>
+</body>
+</html>
