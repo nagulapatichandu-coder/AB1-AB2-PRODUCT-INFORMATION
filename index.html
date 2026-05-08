@@ -158,9 +158,12 @@ tbody td{padding:.65rem 1.2rem;font-size:.85rem;}
 mark{background:rgba(13,148,136,.18);color:var(--teal-dark);border-radius:3px;padding:0 2px;}
 
 .float-btns{position:fixed;bottom:1.8rem;right:1.8rem;display:flex;flex-direction:column;gap:.6rem;z-index:200;}
-.fb{width:56px;height:56px;border-radius:50%;border:none;font-family:'DM Serif Display',serif;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,.18);transition:all .25s;position:relative;}
-.fb-ab1{background:linear-gradient(135deg,var(--teal-dark),var(--teal));color:#fff;}
-.fb-ab2{background:#fff;color:var(--teal-dark);border:2.5px solid var(--teal-light);}
+.fb{width:56px;height:56px;border-radius:50%;border:none;font-family:'DM Serif Display',serif;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,.18);transition:all .25s;position:relative;overflow:hidden;}
+.fb::after{content:'';position:absolute;top:-50%;left:-75%;width:50%;height:200%;background:rgba(255,255,255,.35);transform:skewX(-20deg);animation:fbShine 2.8s ease-in-out infinite;}
+.fb-ab2::after{animation-delay:1.4s;}
+@keyframes fbShine{0%,100%{left:-75%;opacity:0}20%{opacity:1}40%{left:125%;opacity:0}}
+.fb-ab1{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;}
+.fb-ab2{background:linear-gradient(135deg,#ec4899,#f472b6);color:#fff;border:none;}
 .fb.active-f{box-shadow:0 5px 20px var(--shadow2),0 0 0 4px var(--teal-pale);transform:scale(1.08);}
 .fb:hover{transform:scale(1.1);}
 .fb-tip{position:absolute;right:64px;top:50%;transform:translateY(-50%);background:var(--text);color:#fff;padding:.28rem .65rem;border-radius:7px;font-size:.68rem;font-family:'DM Sans',sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;}
@@ -211,6 +214,25 @@ mark{background:rgba(13,148,136,.18);color:var(--teal-dark);border-radius:3px;pa
 .fc-subdept{display:inline-block;padding:.12rem .44rem;border-radius:5px;font-size:.67rem;font-weight:600;background:#eff6ff;color:#1e40af;margin-top:.18rem;margin-left:.2rem;}
 .fac-vacant-label{color:#9ca3af;font-style:italic;font-size:.78rem;}
 .fac-no-results{text-align:center;padding:2rem;color:var(--text3);font-size:.85rem;}
+.fc-edit-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:.18rem .52rem;font-size:.68rem;font-family:"DM Sans",sans-serif;color:var(--text3);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.fc-edit-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-xpale);}
+.fac-table td.td-edit-col{width:60px;text-align:right;vertical-align:middle;}
+.fac-edit-row td{background:var(--teal-xpale)!important;padding:.5rem .8rem!important;}
+.fac-edit-form{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;}
+.fac-edit-form input{padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:8px;font-family:"DM Sans",sans-serif;font-size:.78rem;color:var(--text);outline:none;background:#fff;}
+.fac-edit-form input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(13,148,136,.12);}
+.fac-edit-form input.fi-name{flex:1;min-width:130px;}
+.fac-edit-form input.fi-desig{flex:1;min-width:120px;}
+.fac-edit-form input.fi-dept{width:80px;}
+.fac-edit-form input.fi-sub{width:90px;}
+.fac-edit-form .fe-btns{display:flex;gap:.3rem;}
+.fe-save{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:.3rem .75rem;font-size:.75rem;font-family:"DM Sans",sans-serif;font-weight:600;cursor:pointer;}
+.fe-save:hover{background:var(--teal-dark);}
+.fe-cancel{background:#fff;color:var(--text3);border:1.5px solid var(--border);border-radius:8px;padding:.3rem .65rem;font-size:.75rem;font-family:"DM Sans",sans-serif;cursor:pointer;}
+.fe-cancel:hover{border-color:#ef4444;color:#ef4444;}
+.cat-card.fac-room{cursor:pointer;}
+.cat-card.fac-room:hover{border-color:#ec4899;box-shadow:0 4px 14px rgba(236,72,153,.15);}
+
 .cat-card.has-faculty{position:relative;}
 .fac-pill{display:inline-flex;align-items:center;gap:.2rem;background:var(--teal-pale);color:var(--teal-dark);font-size:.6rem;font-weight:700;padding:.1rem .38rem;border-radius:4px;margin-left:.3rem;vertical-align:middle;}
 </style>
@@ -247,7 +269,7 @@ mark{background:rgba(13,148,136,.18);color:var(--teal-dark);border-radius:3px;pa
 </div>
 
 <div id="flashWrap">
-  <div class="flash-card">
+  <div class="flash-card" id="flashCard">
     <div class="f-badge"><div class="fn" id="fNo"></div><div class="fl">Room</div></div>
     <div class="f-info">
       <div class="f-found">✓ Room Located</div>
@@ -258,6 +280,7 @@ mark{background:rgba(13,148,136,.18);color:var(--teal-dark);border-radius:3px;pa
         <span class="ftag c" id="fCat"></span>
       </div>
     </div>
+    <div id="flashFacultyHint" style="display:none;margin-left:auto;padding:.4rem .9rem;background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#831843;border-radius:10px;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;" onclick="if(_lastFlashedRoom)openFacultyModal(_lastFlashedRoom)">👥 View Faculty →</div>
   </div>
 </div>
 
@@ -345,7 +368,10 @@ function getVisible(){
   return activeBuilding==='both'?enriched:enriched.filter(r=>r.building===activeBuilding);
 }
 
+var _lastFlashedRoom=null;
 function doFlash(r){
+  _lastFlashedRoom=r;
+  if(r.category==='Faculty Room'){openFacultyModal(r);return;}
   document.getElementById('fNo').textContent=r.room_no;
   document.getElementById('fName').textContent=r.room_name;
   document.getElementById('fBldg').textContent=r.building;
@@ -355,10 +381,12 @@ function doFlash(r){
   fw.style.display='block';
   var fc=fw.querySelector('.flash-card');
   fc.style.animation='none';fc.offsetWidth;fc.style.animation='popIn .35s cubic-bezier(.34,1.56,.64,1)';
+  fc.style.cursor='default';
+  fc.onclick=null;
+  document.getElementById('flashFacultyHint').style.display='none';
   document.getElementById('multiWrap').style.display='none';
   document.getElementById('noResult').style.display='none';
   fw.scrollIntoView({behavior:'smooth',block:'nearest'});
-  if(r.category==='Faculty Room'){var _fk=getFacultyKey(r);if(FACULTY_DATA[_fk])openFacultyModal(r);}
 }
 
 function toggleAcc(id){
@@ -369,8 +397,10 @@ function toggleAcc(id){
   hdr.classList.toggle('is-open',!open);
 }
 
+var _dashRooms=[];
 function renderDash(rooms){
   if(!rooms) rooms=getVisible();
+  _dashRooms=[];
   updateKPIs(rooms);
   var html='';
   CAT_ORDER.forEach(function(cat){
@@ -378,15 +408,16 @@ function renderDash(rooms){
     if(!cr.length) return;
     var meta=CATS[cat];
     var id=cat.replace(/\s+/g,'_');
-    var cards=cr.map(function(r){
-      var d=JSON.stringify(r).replace(/'/g,"\\'");
-      var _fk2=getFacultyKey(r);var _fc=FACULTY_DATA&&FACULTY_DATA[_fk2]?FACULTY_DATA[_fk2].filter(function(x){return x.name.toLowerCase()!=='vacant';}).length:0;
-      return '<div class="cat-card'+((_fc>0)?' has-faculty':'')+'"\ onclick="doFlash('+d+')">'
-        +'<div class="cc-no">'+esc(r.room_no)+(_fc>0?'<span class="fac-pill">👥 '+_fc+'</span>':'')+'</div>'
-        +'<div class="cc-name">'+esc(r.room_name)+'</div>'
-        +'<div class="cc-meta"><span class="btag">'+esc(r.building)+'</span> '+esc(r.floor)+'</div>'
-        +'</div>';
-    }).join('');
+     var cards=cr.map(function(r){
+       var ridx=_dashRooms.length; _dashRooms.push(r);
+       var _fk2=getFacultyKey(r);var _fc=FACULTY_DATA&&FACULTY_DATA[_fk2]?FACULTY_DATA[_fk2].filter(function(x){return x.name.toLowerCase()!=='vacant';}).length:0;
+       var isFac=(r.category==='Faculty Room');
+       return '<div class="cat-card'+((_fc>0)?' has-faculty':'')+(isFac?' fac-room':'')+'" onclick="doFlash(_dashRooms['+ridx+'])">'
+         +'<div class="cc-no">'+esc(r.room_no)+(_fc>0?'<span class="fac-pill">👥 '+_fc+'</span>':(isFac?'<span class="fac-pill" style="background:#fce7f3;color:#831843;">👥</span>':''))+'</div>'
+         +'<div class="cc-name">'+esc(r.room_name)+'</div>'
+         +'<div class="cc-meta"><span class="btag">'+esc(r.building)+'</span> '+esc(r.floor)+'</div>'
+         +'</div>';
+     }).join('');
     html+='<div class="dash-sec">'
       +'<div class="acc-hdr" id="hdr_'+id+'" onclick="toggleAcc(\''+id+'\')">'
       +'<div class="acc-icon">'+meta.icon+'</div>'
@@ -534,7 +565,7 @@ function renderFacRows(list){
     return;
   }
   document.getElementById('facNoResults').style.display='none';
-  tbody.innerHTML=list.map(function(f){
+  tbody.innerHTML=list.map(function(f,idx){
     var vacant=f.name.toLowerCase()==='vacant';
     var nameCell=vacant
       ?'<span class="fac-vacant-label">— Vacant —</span>'
@@ -544,8 +575,42 @@ function renderFacRows(list){
       if(f.dept)deptCell+='<span class="fc-dept-chip">'+esc(f.dept)+'</span>';
       if(f.sub_dept)deptCell+='<span class="fc-subdept">'+esc(f.sub_dept)+'</span>';
     }
-    return '<tr class="'+(vacant?'fac-vacant':'')+'"><td><span class="fc-cubicle">'+esc(f.cubicle)+'</span></td><td>'+nameCell+'</td><td>'+deptCell+'</td></tr>';
+    var editBtn='<button class="fc-edit-btn" onclick="startEdit(this,'+idx+')">✏️ Edit</button>';
+    return '<tr class="'+(vacant?'fac-vacant':'')+'" data-idx="'+idx+'"><td><span class="fc-cubicle">'+esc(f.cubicle)+'</span></td><td>'+nameCell+'</td><td>'+deptCell+'</td><td class="td-edit-col">'+editBtn+'</td></tr>';
   }).join('');
+}
+
+function startEdit(btn,idx){
+  var f=_currentFaculty[idx];
+  var tr=btn.closest('tr');
+  tr._origIdx=idx;
+  tr.className='fac-edit-row';
+  tr.innerHTML='<td colspan="4"><div class="fac-edit-form">'
+    +'<input class="fi-name" value="'+esc(f.name)+'" placeholder="Name"/>'
+    +'<input class="fi-desig" value="'+esc(f.designation||'')+'" placeholder="Designation"/>'
+    +'<input class="fi-dept" value="'+esc(f.dept||'')+'" placeholder="Dept"/>'
+    +'<input class="fi-sub" value="'+esc(f.sub_dept||'')+'" placeholder="Sub-dept"/>'
+    +'<div class="fe-btns">'
+    +'<button class="fe-save" onclick="saveEdit(this,'+idx+')">💾 Save</button>'
+    +'<button class="fe-cancel" onclick="cancelEdit('+idx+')">Cancel</button>'
+    +'</div></div></td>';
+}
+
+function saveEdit(btn,idx){
+  var tr=btn.closest('tr');
+  var inputs=tr.querySelectorAll('input');
+  _currentFaculty[idx].name=inputs[0].value.trim()||'Vacant';
+  _currentFaculty[idx].designation=inputs[1].value.trim();
+  _currentFaculty[idx].dept=inputs[2].value.trim();
+  _currentFaculty[idx].sub_dept=inputs[3].value.trim();
+  var occ=_currentFaculty.filter(function(f){return f.name.toLowerCase()!=='vacant';}).length;
+  document.getElementById('mStatOccupied').textContent=occ;
+  document.getElementById('mStatVacant').textContent=_currentFaculty.length-occ;
+  renderFacRows(_currentFaculty);
+}
+
+function cancelEdit(idx){
+  renderFacRows(_currentFaculty);
 }
 
 function filterFaculty(q){
@@ -598,6 +663,7 @@ renderDash();
             <th style="width:80px">Cubicle</th>
             <th>Name &amp; Designation</th>
             <th>Department</th>
+            <th style="width:60px"></th>
           </tr>
         </thead>
         <tbody id="facTbody"></tbody>
